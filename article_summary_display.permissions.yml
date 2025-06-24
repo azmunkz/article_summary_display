@@ -1,0 +1,4 @@
+access article summary settings:
+  title: 'Access Article Summary Settings'
+  description: 'Allow users to access and modify summary settings'
+  restrict access: TRUE

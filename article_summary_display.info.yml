@@ -1,0 +1,8 @@
+name: 'Article Summary Display'
+type: module
+description: 'Generates and displays AI-powered article summaries.'
+core_version_requirement: ^10 || ^11
+package: Custom
+dependencies:
+  - node
+  - key

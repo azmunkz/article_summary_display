@@ -1,0 +1,6 @@
+article_summary_display.settings:
+  title: 'Article Summary Settings'
+  description: 'Configure AI-generated article summaries.'
+  route_name: article_summary_display.settings
+  parent: system.admin_config_content
+  weight: 100

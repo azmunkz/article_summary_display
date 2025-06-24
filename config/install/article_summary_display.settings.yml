@@ -1,0 +1,3 @@
+summary_display_placement: 'above'
+summary_display_prompt: 'Summarize the article content in 3–5 concise sentences.'
+summary_display_type: 'sentences'

@@ -1,0 +1,16 @@
+article_summary_display.settings:
+  path: '/admin/config/content/article-summary'
+  defaults:
+    _form: '\Drupal\article_summary_display\Form\SettingsForm'
+    _title: 'Article Summary Settings'
+  requirements:
+    _permission: 'administer site configuration'
+
+article_summary_display.ajax_summary:
+  path: '/article-summary/ajax{node}'
+  defaults:
+    _controller: '\Drupal\article_summary_display\Controller\SummaryAjaxController::getSummary'
+  requirements:
+    _permission: 'access article summary content'
+  options:
+    _no_cache: TRUE

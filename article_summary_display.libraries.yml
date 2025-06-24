@@ -1,0 +1,11 @@
+summary_display:
+  version: 1.x
+  js:
+    js/summary_display.js: {}
+  css:
+    theme:
+      css/summary_display.css: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once

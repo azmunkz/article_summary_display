@@ -1,0 +1,18 @@
+{% set type_class = display_type == 'list' ? 'summary-list' : 'summary-paragraph' %}
+{% set scroll_class = scroll_mode ? 'scroll-mode' : '' %}
+{% set classes = ['article-summary', type_class, scroll_class] %}
+
+<div{{ attributes.addClass(classes) }}>
+  {% if display_type == 'list' %}
+    <ul>
+      {% for sentence in summary_text|split('.') %}
+        {% if sentence|trim %}
+          <li>{{ sentence|trim }}</li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% else %}
+    {{ summary_text }}
+  {% endif %}
+</div>
+

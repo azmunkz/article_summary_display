@@ -1,0 +1,12 @@
+services:
+  article_summary_display.summary_generator:
+    class: Drupal\article_summary_display\Service\SummaryGenerator
+    arguments:
+      - '@key.repository'
+      - '@logger.channel.article_summary_display'
+      - '@config.factory'
+
+  logger.channel.article_summary_display:
+    class: Drupal\Core\Logger\LoggerChannel
+    factory: ['@logger.factory', 'get']
+    arguments: ['article_summary_display']

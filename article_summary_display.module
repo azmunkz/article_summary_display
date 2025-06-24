@@ -1,0 +1,178 @@
+<?php
+
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_entity_insert().
+ */
+function article_summary_display_entity_insert(EntityInterface $entity): void {
+  _article_summary_display_enqueue_summary_job($entity);
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function article_summary_display_entity_update(EntityInterface $entity): void {
+  _article_summary_display_enqueue_summary_job($entity);
+}
+
+/**
+ * Enqueue article node for summary generation.
+ */
+function _article_summary_display_enqueue_summary_job(EntityInterface $entity): void {
+  if ($entity->getEntityTypeId() !== 'node' || $entity->bundle() !== 'article') {
+    return;
+  }
+
+  \Drupal::logger('article_summary_display')->notice('Checking node @nid for summary generation', [
+    '@nid' => $entity->id(),
+  ]);
+
+
+  if (!$entity->hasField('field_generated_summary')) {
+    \Drupal::logger('article_summary_display')->warning('Node missing field_generated_summary field');
+    return;
+  }
+
+  // If already has summary, skip
+  if (!$entity->get('field_generated_summary')->isEmpty()) {
+    return;
+  }
+
+  // Enqueue for processing
+  $queue = \Drupal::queue('article_summary_display.queue');
+  $queue->createItem([
+    'nid' => $entity->id(),
+  ]);
+
+  \Drupal::logger('article_summary_display')->notice('Queued summary generation for node @nid', [
+    '@nid' => $entity->id(),
+  ]);
+}
+
+/**
+ * Implements hook_preprocess_node().
+ */
+//function article_summary_display_preprocess_node(array &$variables): void {
+//  $node = $variables['node'];
+//
+//  if ($node->getType() !== 'article') {
+//    return;
+//  }
+//
+//  if (!$node->hasField('field_generated_summary') || $node->get('field_generated_summary')->isEmpty()) {
+//    return;
+//  }
+//
+//  // ❌ Prevent double render
+//  unset($variables['content']['field_generated_summary']);
+//
+//  $summary = $node->get('field_generated_summary')->value ?? '';
+//  if (trim($summary) === '') {
+//    return;
+//  }
+//
+//  $config = \Drupal::config('article_summary_display.settings');
+//  $placement = $config->get('summary_display_placement') ?? 'above';
+//  $display_type = $config->get('summary_display_type') ?? 'sentences';
+//
+//  $render_array = [
+//    '#theme' => 'article_summary_block',
+//    '#summary_text' => $summary,
+//    '#display_type' => $display_type,
+//    '#scroll_mode' => ($placement === 'scroll_30'),
+//    '#attributes' => [
+//      'class' => [],
+//    ],
+//  ];
+//
+//
+//  if ($placement === 'scroll_30') {
+//    $render_array['#attributes']['class'][] = 'scroll-mode';
+//    $render_array['#attached']['library'][] = 'article_summary_display/summary_display';
+//    $render_array['#attached']['drupalSettings']['articleSummary'] = [
+//      'nid' => $node->id(),
+//      'placement' => $placement,
+//    ];
+//  }
+//
+//
+//  // Always attach the CSS/JS library so summary block is styled.
+//  $variables['#attached']['library'][] = 'article_summary_display/summary_display';
+//
+//  $variables['content']['summary_display'] = $render_array;
+//}
+
+function article_summary_display_preprocess_node(array &$variables): void {
+  $node = $variables['node'];
+
+  if ($node->getType() !== 'article') {
+    return;
+  }
+
+  if (!$node->hasField('field_generated_summary') || $node->get('field_generated_summary')->isEmpty()) {
+    return;
+  }
+
+  // ❌ Prevent double render
+  unset($variables['content']['field_generated_summary']);
+
+  $summary = $node->get('field_generated_summary')->value ?? '';
+  if (trim($summary) === '') {
+    return;
+  }
+
+  $config = \Drupal::config('article_summary_display.settings');
+  $placement = $config->get('summary_display_placement') ?? 'above';
+  $display_type = $config->get('summary_display_type') ?? 'sentences';
+
+  $render_array = [
+    '#theme' => 'article_summary_block',
+    '#summary_text' => $summary,
+    '#display_type' => $display_type,
+    '#scroll_mode' => ($placement === 'scroll_30'),
+    '#attributes' => [
+      'class' => ['article-summary'],
+    ],
+    '#attached' => [],
+  ];
+
+  // Scroll-based placement logic
+  if ($placement === 'scroll_30') {
+    $render_array['#attributes']['class'][] = 'scroll-mode';
+    $render_array['#attached']['library'][] = 'article_summary_display/summary_display';
+    $render_array['#attached']['drupalSettings']['articleSummary'] = [
+      'nid' => $node->id(),
+      'placement' => $placement,
+    ];
+  }
+
+  // 📌 Always attach summary_display library for consistent styling
+  $render_array['#attached']['library'][] = 'article_summary_display/summary_display';
+
+  // Inject based on placement
+  if ($placement === 'above') {
+    $variables['content'] = ['summary_display' => $render_array] + $variables['content'];
+  } else {
+    $variables['content']['summary_display'] = $render_array;
+  }
+}
+
+
+/**
+ * Implements hook_theme().
+ */
+function article_summary_display_theme($existing, $type, $theme, $path): array {
+  return [
+    'article_summary_block' => [
+      'render element' => 'elements',
+      'template' => 'article-summary-block',
+      'variables' => [
+        'summary_text' => '',
+        'display_type' => 'sentences',
+        'scroll_mode' => FALSE,
+      ],
+    ],
+  ];
+}
+
