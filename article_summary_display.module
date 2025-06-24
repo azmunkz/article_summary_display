@@ -126,9 +126,12 @@ function article_summary_display_preprocess_node(array &$variables): void {
   $placement = $config->get('summary_display_placement') ?? 'above';
   $display_type = $config->get('summary_display_type') ?? 'sentences';
 
+  $decoded = json_decode($summary, true);
+  $sentences = $decoded['summary_sentences'] ?? [];
+
   $render_array = [
     '#theme' => 'article_summary_block',
-    '#summary_text' => $summary,
+    '#summary_text' => is_array($sentences) ? $sentences : [],
     '#display_type' => $display_type,
     '#scroll_mode' => ($placement === 'scroll_30'),
     '#attributes' => [
@@ -168,9 +171,10 @@ function article_summary_display_theme($existing, $type, $theme, $path): array {
       'render element' => 'elements',
       'template' => 'article-summary-block',
       'variables' => [
-        'summary_text' => '',
+        'summary_text' => [],
         'display_type' => 'sentences',
         'scroll_mode' => FALSE,
+        'attributes' => [],
       ],
     ],
   ];

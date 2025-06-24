@@ -5,14 +5,14 @@
 <div{{ attributes.addClass(classes) }}>
   {% if display_type == 'list' %}
     <ul>
-      {% for sentence in summary_text|split('.') %}
+      {% for sentence in summary_text %}
         {% if sentence|trim %}
           <li>{{ sentence|trim }}</li>
         {% endif %}
       {% endfor %}
     </ul>
   {% else %}
-    {{ summary_text }}
+    {{ summary_text|join(' ') }}
   {% endif %}
 </div>
 
