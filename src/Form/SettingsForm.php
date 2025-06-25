@@ -71,8 +71,8 @@ class SettingsForm extends ConfigFormBase
     $form['advanced_settings']['summary_max_tokens'] = [
       '#type' => 'number',
       '#title' => $this->t('Max Tokens'),
-      '#description' => $this->t('The maximum number of tokens to generate (e.g., 250.'),
-      '#default_value' => $config->get('summary_max_tokens') ?? 250,
+      '#description' => $this->t('The maximum number of tokens to generate (e.g., 500.)'),
+      '#default_value' => $config->get('summary_max_tokens') ?? 500,
       '#min' => 50,
       '#max' => 4096
     ];
