@@ -24,3 +24,15 @@
   opacity: 1;
 }
 
+.summary-history-link {
+  cursor: pointer;
+  color: #0074bd;
+}
+
+.summary-history-list {
+  text-align: left;
+  padding: 0;
+}
+.summary-history-list li{
+  margin-bottom: 1rem;
+}
